@@ -20,7 +20,13 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 + resource shrinking: the APK ships inside system_ext (ROM
+            // build) where partition slack is tight — must stay small
+            isMinifyEnabled = true
+            isShrinkResources = true
+            // debug keystore signing so the priv-app APK installs without a
+            // signing service; release build is NOT debuggable (unlike debug)
+            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
