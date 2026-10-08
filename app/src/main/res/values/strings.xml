@@ -63,6 +63,8 @@
     <string name="fcm_repaired">Repaired — FCM heartbeat sent</string>
     <string name="fcm_repair_failed">Write failed — run as root: settings put system MILLET_NO_RESTRICT_APP &lt;list&gt;,com.google.android.gms</string>
     <string name="fcm_adb_hint">If repair keeps failing on a stock ROM, grant WRITE_SECURE_SETTINGS via adb and retry.</string>
+    <string name="fcm_protect_title">Protect more apps</string>
+    <string name="fcm_extra_apps">Extra protected: %1$s</string>
     <string name="hidden_autostart_manager">Autostart manager</string>
     <string name="hidden_fcm_diagnostics">FCM diagnostics (Google Play services)</string>
     <string name="rom_hooks_missing_banner">This HyperOS build has no ROM-side consumers for the Toolbox keys (KaoriosHook not found). Spoof tabs write settings nothing reads — only FCM guard, revocation check, hidden shortcuts and the FPS overlay work here.</string>

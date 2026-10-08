@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.xiaomi.toolbox.R
 import com.xiaomi.toolbox.data.FcmGuard
+import com.xiaomi.toolbox.ui.apps.MultiAppPickerDialog
 import com.xiaomi.toolbox.data.Keys
 import com.xiaomi.toolbox.data.Power
 import com.xiaomi.toolbox.data.SettingsStore
@@ -122,7 +123,9 @@ private fun FcmCard(store: SettingsStore) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     var tick by remember { mutableStateOf(0) }
+    var pickOpen by remember { mutableStateOf(false) }
     val status = remember(tick) { FcmGuard.status(store) }
+    val extras = remember(tick) { FcmGuard.extras(ctx) }
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.fcm_title), style = MaterialTheme.typography.labelMedium)
@@ -136,6 +139,12 @@ private fun FcmCard(store: SettingsStore) {
                 stringResource(R.string.fcm_apps_in_list, status.count),
                 style = MaterialTheme.typography.bodySmall,
             )
+            if (extras.isNotEmpty()) {
+                Text(
+                    stringResource(R.string.fcm_extra_apps, extras.sorted().joinToString(", ")),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
             if (!status.present) {
                 Button(onClick = {
                     scope.launch(Dispatchers.IO) {
@@ -161,7 +170,25 @@ private fun FcmCard(store: SettingsStore) {
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
+            OutlinedButton(onClick = { pickOpen = true }) {
+                Text(stringResource(R.string.fcm_protect_title))
+            }
         }
+    }
+    if (pickOpen) {
+        MultiAppPickerDialog(
+            initial = extras,
+            exclude = setOf(FcmGuard.REQUIRED, FcmGuard.GSF),
+            onConfirm = { picked ->
+                pickOpen = false
+                scope.launch(Dispatchers.IO) {
+                    FcmGuard.setExtras(ctx, picked)
+                    FcmGuard.repairAndKick(ctx, store)
+                    withContext(Dispatchers.Main) { tick++ }
+                }
+            },
+            onDismiss = { pickOpen = false },
+        )
     }
 }
 
