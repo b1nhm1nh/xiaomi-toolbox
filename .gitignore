@@ -1,0 +1,20 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/app/build
+/captures
+*.apk
+*.ap_
+*.dex
+*.class
+.externalNativeBuild
+.cxx
+*.hprof
+.kotlin
+
+# Keybox material must never be committed again (private keys)
+Toolbox-data/Keybox.xml
+**/Keybox*.xml
