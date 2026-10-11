@@ -33,8 +33,19 @@ HyperOS `adb install` → `INSTALL_FAILED_USER_RESTRICTED`. APKs: `adb push` + `
 ## After APK change
 
 ```
-.\gradlew.bat :app:assembleDebug
 .\gradlew.bat :app:testDebugUnitTest
+.\gradlew.bat :app:assembleDebug      # adb install (standalone use)
+.\gradlew.bat :app:assembleRelease    # ROM embedding (R8-shrunk, debug-signed)
 ```
 
 Grant `WRITE_SECURE_SETTINGS` after install. Seed runs on next process start (`kaorios_time` must change).
+
+## Route B ROM embedding
+
+Release builds are R8+resource-shrunk (2.2MB) to fit the system_ext partition slack of
+the official shennong CN super.img. The ROM build splices the APK + the repo-root
+`privapp-permissions-xiaomi-toolbox.xml` into `system_ext_a` — keep that allowlist in
+sync with the manifest or `ro.control_privapp_permissions=enforce` bootloops. Pipeline:
+`E:\w\git\rom-builder\rom-build\README.md`. FcmGuard (`MILLET_NO_RESTRICT_APP` repair,
+extra protected apps) is the feature the ROM embed exists for: it auto-repairs at boot,
+so notifications survive PowerKeeper with zero adb after flash.
