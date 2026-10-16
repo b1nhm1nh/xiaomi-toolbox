@@ -25,4 +25,20 @@ class FcmGuardTest {
         assertEquals(listOf("a", "b"), FcmGuard.splitList("a,, b,,"))
         assertEquals(emptyList<String>(), FcmGuard.splitList(""))
     }
+
+    @Test
+    fun repairBaseFallsBackToLastGoodOnlyWhenWiped() {
+        assertEquals(listOf("a"), FcmGuard.repairBase(listOf("a"), listOf("x", "y")))
+        assertEquals(listOf("x", "y"), FcmGuard.repairBase(emptyList(), listOf("x", "y")))
+    }
+
+    @Test
+    fun autostartClassify() {
+        // AppOpsManager.MODE_ALLOWED = 0, MODE_IGNORED = 1
+        assertEquals(FcmApps.Autostart.ENABLED, FcmApps.classify(0, 0))
+        assertEquals(FcmApps.Autostart.DISABLED, FcmApps.classify(1, 1))
+        assertEquals(FcmApps.Autostart.PARTIAL, FcmApps.classify(0, 1))
+        assertEquals(FcmApps.Autostart.UNKNOWN, FcmApps.classify(null, 0))
+        assertEquals(FcmApps.Autostart.UNKNOWN, FcmApps.classify(3, 3))
+    }
 }

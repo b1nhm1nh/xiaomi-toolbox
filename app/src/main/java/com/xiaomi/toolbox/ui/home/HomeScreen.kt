@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,18 +34,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.xiaomi.toolbox.R
 import com.xiaomi.toolbox.data.FcmGuard
-import com.xiaomi.toolbox.ui.apps.MultiAppPickerDialog
 import com.xiaomi.toolbox.data.Keys
 import com.xiaomi.toolbox.data.Power
 import com.xiaomi.toolbox.data.SettingsStore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import android.widget.Toast
 import java.io.File
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onOpenFcm: () -> Unit) {
     val ctx = LocalContext.current
     val store = remember { SettingsStore(ctx) }
     var powerOpen by remember { mutableStateOf(false) }
@@ -65,7 +59,7 @@ fun HomeScreen() {
         StatRow(stringResource(R.string.battery), stats.battery)
         StatRow(stringResource(R.string.ram), stats.ram)
         StatRow(stringResource(R.string.storage), stats.storage)
-        FcmCard(store)
+        FcmCard(store, onOpenFcm)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = { powerOpen = true }, modifier = Modifier.weight(1f)) {
                 Text(stringResource(R.string.power))
@@ -119,13 +113,8 @@ private fun StatRow(label: String, value: String) {
 }
 
 @Composable
-private fun FcmCard(store: SettingsStore) {
-    val ctx = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var tick by remember { mutableStateOf(0) }
-    var pickOpen by remember { mutableStateOf(false) }
-    val status = remember(tick) { FcmGuard.status(store) }
-    val extras = remember(tick) { FcmGuard.extras(ctx) }
+private fun FcmCard(store: SettingsStore, onOpen: () -> Unit) {
+    val status = remember { FcmGuard.status(store) }
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.fcm_title), style = MaterialTheme.typography.labelMedium)
@@ -139,56 +128,8 @@ private fun FcmCard(store: SettingsStore) {
                 stringResource(R.string.fcm_apps_in_list, status.count),
                 style = MaterialTheme.typography.bodySmall,
             )
-            if (extras.isNotEmpty()) {
-                Text(
-                    stringResource(R.string.fcm_extra_apps, extras.sorted().joinToString(", ")),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
-            if (!status.present) {
-                Button(onClick = {
-                    scope.launch(Dispatchers.IO) {
-                        FcmGuard.repairAndKick(ctx, store)
-                        val now = FcmGuard.status(store)
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(
-                                ctx,
-                                ctx.getString(
-                                    when {
-                                        now.present -> R.string.fcm_repaired
-                                        else -> R.string.fcm_repair_failed
-                                    },
-                                ),
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                        }
-                        tick++
-                    }
-                }) { Text(stringResource(R.string.fcm_repair)) }
-                Text(
-                    stringResource(R.string.fcm_adb_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
-            OutlinedButton(onClick = { pickOpen = true }) {
-                Text(stringResource(R.string.fcm_protect_title))
-            }
+            OutlinedButton(onClick = onOpen) { Text(stringResource(R.string.fcm_open)) }
         }
-    }
-    if (pickOpen) {
-        MultiAppPickerDialog(
-            initial = extras,
-            exclude = setOf(FcmGuard.REQUIRED, FcmGuard.GSF),
-            onConfirm = { picked ->
-                pickOpen = false
-                scope.launch(Dispatchers.IO) {
-                    FcmGuard.setExtras(ctx, picked)
-                    FcmGuard.repairAndKick(ctx, store)
-                    withContext(Dispatchers.Main) { tick++ }
-                }
-            },
-            onDismiss = { pickOpen = false },
-        )
     }
 }
 

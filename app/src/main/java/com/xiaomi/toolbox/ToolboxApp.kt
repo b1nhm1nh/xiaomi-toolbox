@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.UserManager
 import com.xiaomi.toolbox.boot.DailySyncReceiver
 import com.xiaomi.toolbox.data.SettingsStore
+import com.xiaomi.toolbox.fcm.FcmGuardService
 import com.xiaomi.toolbox.overlay.FpsOverlayService
 
 class ToolboxApp : Application() {
@@ -19,5 +20,6 @@ class ToolboxApp : Application() {
         } catch (_: Throwable) {
             // background FGS starts can throw ForegroundServiceStartNotAllowedException
         }
+        FcmGuardService.startIfEnabled(this)
     }
 }

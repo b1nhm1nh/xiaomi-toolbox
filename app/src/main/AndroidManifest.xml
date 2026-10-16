@@ -51,6 +51,17 @@
                 android:value="fps_overlay"/>
         </service>
 
+        <!-- MILLET_NO_RESTRICT_APP watchdog; specialUse ignored at targetSdk 22 but kept for the ROM build -->
+        <service
+            android:name=".fcm.FcmGuardService"
+            android:exported="false"
+            android:stopWithTask="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="fcm_guard"/>
+        </service>
+
         <receiver
             android:name=".boot.DailySyncReceiver"
             android:exported="false"/>
@@ -60,6 +71,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
             </intent-filter>
         </receiver>
     </application>

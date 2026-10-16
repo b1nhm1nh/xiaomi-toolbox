@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.xiaomi.toolbox.ui.apps.AppsSpoofScreen
+import com.xiaomi.toolbox.ui.fcm.FcmScreen
 import com.xiaomi.toolbox.ui.framework.FrameworkScreen
 import com.xiaomi.toolbox.ui.hidden.HiddenSettingsScreen
 import com.xiaomi.toolbox.ui.home.HomeScreen
@@ -71,7 +72,7 @@ class MainActivity : ComponentActivity() {
                 ) { pad ->
                     androidx.compose.foundation.layout.Box(Modifier.padding(pad)) {
                         when (tab) {
-                            Tab.Home -> HomeScreen()
+                            Tab.Home -> HomeScreen { tab = Tab.Toolbox; hub = HubRoute.Fcm }
                             Tab.Settings -> SettingsScreen()
                             Tab.Toolbox -> when (hub) {
                                 HubRoute.Hub -> HubScreen { hub = it }
@@ -80,6 +81,7 @@ class MainActivity : ComponentActivity() {
                                 HubRoute.Framework -> FrameworkScreen { hub = HubRoute.Hub }
                                 HubRoute.Rom -> RomSettingsScreen { hub = HubRoute.Hub }
                                 HubRoute.Hidden -> HiddenSettingsScreen { hub = HubRoute.Hub }
+                                HubRoute.Fcm -> FcmScreen { hub = HubRoute.Hub }
                             }
                         }
                     }

@@ -55,6 +55,7 @@ fun HubScreen(onOpen: (HubRoute) -> Unit) {
         HubCard(R.string.spoof_subtab_apps, R.string.spoof_hub_apps_sub, rom.hooks) { onOpen(HubRoute.AppsSpoof) }
         HubCard(R.string.spoof_subtab_framework, R.string.spoof_hub_framework_sub, rom.hooks) { onOpen(HubRoute.Framework) }
         HubCard(R.string.spoof_subtab_zk, R.string.spoof_hub_zk_sub, rom.hooks) { onOpen(HubRoute.Rom) }
+        HubCard(R.string.fcm_guard_title, R.string.fcm_hub_sub, true) { onOpen(HubRoute.Fcm) }
         HubCard(R.string.spoof_subtab_hidden, R.string.spoof_hub_hidden_sub, true) { onOpen(HubRoute.Hidden) }
     }
 }
